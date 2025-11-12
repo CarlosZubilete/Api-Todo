@@ -1,10 +1,10 @@
 import { type Request, type Response, type NextFunction } from "express";
-import { UnauthorizedException } from "../exceptions/UnauthorizedException.js";
-import { ErrorCode } from "../exceptions/HttpException.js";
+import { UnauthorizedException } from "../exceptions/UnauthorizedException";
+import { ErrorCode } from "../exceptions/HttpException";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../secrets.js";
-import type { Token, User } from "../generated/client.js";
-import { db } from "../config/db.js";
+import { JWT_SECRET } from "../secrets";
+import type { Token, User } from "../generated/client";
+import { db } from "../config/db";
 
 export const authMiddleware = async (
   req: Request,
@@ -12,7 +12,10 @@ export const authMiddleware = async (
   next: NextFunction
 ) => {
   // is there a token?
-  const token: string = req.headers.authorization?.split(" ")[1]!; // "bearer <token>"
+  //const token: string = req.headers.authorization?.split(" ")[1]!; // "bearer <token>"
+
+  const token: any = req.cookies.jwt; // there's not typed ....
+  console.log("TOKEN: " + token);
 
   if (!token)
     return next(
@@ -20,7 +23,7 @@ export const authMiddleware = async (
     );
   // verify token:
   try {
-    const payload: any = jwt.verify(token, JWT_SECRET) as any; // DON'T USE "ANY"
+    const payload: any = jwt.verify(token, JWT_SECRET) as any; // there's not typed ....
 
     const userToken: Token | null = await db.token.findFirst({
       where: {
@@ -44,11 +47,5 @@ export const authMiddleware = async (
   }
 };
 
-// const user: User | null = await db.user.findFirst({
-//   where: { id: payload.sub },
-// });
-
-// if (!user)
-//   return next(
-//     new UnauthorizedException("Unauthorized", ErrorCode.UNAUTHORIZED)
-//   );
+// This is a verify when we're verifying token without cookie ...
+// const token: string = req.headers.authorization?.split(" ")[1]!; // "bearer <token>"

@@ -1,7 +1,7 @@
 import { hashSync } from "bcrypt";
-import { db } from "../../config/db.js";
-import { JWT_SECRET, SALT_ROUND } from "../../secrets.js";
-import { type Token, type User } from "../../generated/client.js";
+import { db } from "../../config/db";
+import { JWT_SECRET, SALT_ROUND } from "../../secrets";
+import { type Token, type User } from "../../generated/client";
 import jwt from "jsonwebtoken";
 
 export const create = async (
@@ -46,9 +46,9 @@ export const createToken = async (
   // Validation:
   if (!saveToken) throw new Error("Can't save token into Token table");
 
-  const payload = {
-    token,
-  };
+  // const payload = {
+  //   token,
+  // };
 
   return token;
 };

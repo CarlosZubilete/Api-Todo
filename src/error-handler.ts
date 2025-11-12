@@ -4,8 +4,8 @@ import {
   type NextFunction,
   type RequestHandler,
 } from "express";
-import { ErrorCode, HttpException } from "./exceptions/HttpException.js";
-import { InternalException } from "./exceptions/InternalException.js";
+import { ErrorCode, HttpException } from "./exceptions/HttpException";
+import { InternalException } from "./exceptions/InternalException";
 
 export const errorHandler = (method: RequestHandler): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction) => {

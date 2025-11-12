@@ -3,9 +3,10 @@
   "compilerOptions": {
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
-    "types": [],
+    "module": "esnext",
+    "target": "ES2017",
+    "esModuleInterop": true,
+    "types": [],    
     // Other Outputs
     "sourceMap": true,
     "declaration": true,
@@ -21,5 +22,9 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-  }
+    "moduleResolution": "node",
+  
+    "typeRoots": ["./src/types", "./node_modules/@types"]
+  },
+  "include": ["src"]
 }

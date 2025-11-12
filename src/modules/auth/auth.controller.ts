@@ -1,9 +1,10 @@
 import { type NextFunction, type Request, type Response } from "express";
-import { BadRequestException } from "../../exceptions/BadRequestException.js";
-import { ErrorCode } from "../../exceptions/HttpException.js";
-import * as service from "./auth.service.js";
-import { NotFoundException } from "../../exceptions/NotFoundException.js";
+import { BadRequestException } from "../../exceptions/BadRequestException";
+import { ErrorCode } from "../../exceptions/HttpException";
+import * as service from "./auth.service";
+import { NotFoundException } from "../../exceptions/NotFoundException";
 import { compareSync } from "bcrypt";
+import { NODE_ENV } from "../../secrets";
 
 export const signup = async (
   req: Request,
@@ -40,24 +41,30 @@ export const login = async (
 
   const user = await service.isExists({ email });
 
-  if (!user) {
+  if (!user)
     return next(
       new NotFoundException("User does not exists!", ErrorCode.USER_NOT_FOUND)
     );
-  }
 
-  if (!compareSync(password, user.password)) {
+  if (!compareSync(password, user.password))
     return next(
       new BadRequestException(
         "Incorrect password!",
         ErrorCode.INCORRECT_PASSWORD
       )
     );
-  }
 
   const token = await service.createToken(user);
 
-  res.status(201).json(token);
+  res.cookie("jwt", token, {
+    httpOnly: true,
+    // sameSite: "strict", // o 'lax'
+    secure: NODE_ENV === "production",
+    maxAge: 60 * 60 * 1000,
+    // path: '/', domain: 'your-dns'
+  });
+
+  res.status(200).json(token);
 };
 
 export const logout = async (
@@ -71,6 +78,12 @@ export const logout = async (
     return next(
       new NotFoundException("Token does not exists!", ErrorCode.USER_NOT_FOUND)
     );
+
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    // sameSite: "strict", // o 'lax'
+    secure: NODE_ENV === "production",
+  });
 
   res.status(201).json({ message: "Logout success" });
 };

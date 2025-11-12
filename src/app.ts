@@ -4,13 +4,15 @@ import express, {
   type Response,
   type NextFunction,
 } from "express";
-import { PORT } from "./secrets.js";
-import rootRouter from "./modules/root.routes.js";
-import { errorMiddleware } from "./middleware/errorMiddleware.js";
+import { PORT } from "./secrets";
+import rootRouter from "./modules/root.routes";
+import { errorMiddleware } from "./middleware/errorMiddleware";
+import cookieParser from "cookie-parser";
 
 const app: Express = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use("/api", rootRouter);
 
 app.use(errorMiddleware);
