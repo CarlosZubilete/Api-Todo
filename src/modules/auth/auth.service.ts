@@ -26,7 +26,7 @@ export const createToken = async (
   user: Pick<User, "id" | "name" | "email" | "password" | "role">
 ) => {
   // 1. generate token
-  const token = jwt.sign(
+  const token: string = jwt.sign(
     {
       sub: user.id,
       name: user.name,
@@ -42,42 +42,28 @@ export const createToken = async (
       userId: user.id,
     },
   });
-
   // Validation:
   if (!saveToken) throw new Error("Can't save token into Token table");
-
-  // const payload = {
-  //   token,
-  // };
 
   return token;
 };
 
+// TODO: if we still use sqlite change: hard delete (physical delete) for Token.
 export const deleteToken = async (token: string, id: number) => {
-  console.log("deleteToken token" + token);
-  console.log("deleteToken id" + id);
+  // console.log("deleteToken token" + token);
+  // console.log("deleteToken id" + id);
   return await db.token.update({
     where: {
       id,
       key: token,
+      active: true,
     },
     data: {
       active: false,
     },
   });
 };
-// const userToken = await db.token.findFirst({
-//   where: {
-//     key: token,
-//   },
-// });
 
-// const update = await db.token.update({
-//   where: {
-//     id,
-//     key: token,
-//   },
-//   data: {
-//     active: false,
-//   },
-// });
+export const userList = async () => {
+  return await db.user.findMany();
+};

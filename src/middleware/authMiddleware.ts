@@ -1,10 +1,15 @@
 import { type Request, type Response, type NextFunction } from "express";
 import { UnauthorizedException } from "../exceptions/UnauthorizedException";
 import { ErrorCode } from "../exceptions/HttpException";
-import jwt from "jsonwebtoken";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 import { JWT_SECRET } from "../secrets";
-import type { Token, User } from "../generated/client";
 import { db } from "../config/db";
+
+interface AuthPayload extends JwtPayload {
+  sub: string;
+  name: string;
+  role: string;
+}
 
 export const authMiddleware = async (
   req: Request,
@@ -14,8 +19,8 @@ export const authMiddleware = async (
   // is there a token?
   //const token: string = req.headers.authorization?.split(" ")[1]!; // "bearer <token>"
 
-  const token: any = req.cookies.jwt; // there's not typed ....
-  console.log("TOKEN: " + token);
+  const token: string | undefined = req.cookies.jwt;
+  // console.log("TOKEN: " + token);
 
   if (!token)
     return next(
@@ -23,14 +28,15 @@ export const authMiddleware = async (
     );
   // verify token:
   try {
-    const payload: any = jwt.verify(token, JWT_SECRET) as any; // there's not typed ....
+    const payload: AuthPayload = jwt.verify(token, JWT_SECRET) as AuthPayload;
 
-    const userToken: Token | null = await db.token.findFirst({
+    const userToken = await db.token.findFirst({
       where: {
-        userId: payload.sub,
+        userId: Number(payload.sub),
         key: token,
         active: true,
       },
+      include: { user: true },
     });
 
     if (!userToken)
@@ -38,8 +44,15 @@ export const authMiddleware = async (
         new UnauthorizedException("Unauthorized", ErrorCode.UNAUTHORIZED)
       );
 
-    // todo: we have to create a express.d.ts,.
-    req.body = userToken;
+    req.user = {
+      id: userToken.userId,
+      role: userToken.user.role || payload.role,
+    };
+
+    req.token = {
+      id: userToken.id,
+      key: userToken.key,
+    };
 
     next();
   } catch (err) {
@@ -49,3 +62,19 @@ export const authMiddleware = async (
 
 // This is a verify when we're verifying token without cookie ...
 // const token: string = req.headers.authorization?.split(" ")[1]!; // "bearer <token>"
+
+/* 
+
+const user: User | null = await db.user.findFirst({
+  where: {
+    id: Number(payload.sub),
+  },
+});
+
+if (!user)
+  return next(
+    new UnauthorizedException("Unauthorized", ErrorCode.UNAUTHORIZED)
+  );
+
+req.user = user;
+*/

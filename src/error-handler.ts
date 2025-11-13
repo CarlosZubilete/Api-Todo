@@ -6,6 +6,8 @@ import {
 } from "express";
 import { ErrorCode, HttpException } from "./exceptions/HttpException";
 import { InternalException } from "./exceptions/InternalException";
+import { ZodError } from "zod";
+import { ValidationException } from "./exceptions/ValidationException";
 
 export const errorHandler = (method: RequestHandler): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -16,6 +18,8 @@ export const errorHandler = (method: RequestHandler): RequestHandler => {
       let exception: HttpException;
       if (err instanceof HttpException) {
         exception = err;
+      } else if (err instanceof ZodError) {
+        exception = new ValidationException(err);
       } else {
         exception = new InternalException(
           "Something went wrong!",
@@ -23,20 +27,26 @@ export const errorHandler = (method: RequestHandler): RequestHandler => {
           ErrorCode.INTERNAL_EXCEPTION
         );
       }
-      // if (!res.headersSent) {
-      //   res.status(exception._statusCode).json({
-      //     message: exception._message,
-      //     errorCode: exception._errorCode,
-      //     errors: exception._errors,
-      //   });
-      // }
-      // res.status(exception._statusCode).json({
-      //   message: exception._message,
-      //   errorCode: exception._errorCode,
-      //   errors: exception._errors,
-      // });
+      res.status(exception._statusCode).json({
+        message: exception._message,
+        errorCode: exception._errorCode,
+        errors: exception._errors,
+      });
 
       next(exception);
     }
   };
 };
+
+// if (!res.headersSent) {
+//   res.status(exception._statusCode).json({
+//     message: exception._message,
+//     errorCode: exception._errorCode,
+//     errors: exception._errors,
+//   });
+// }
+// res.status(exception._statusCode).json({
+//   message: exception._message,
+//   errorCode: exception._errorCode,
+//   errors: exception._errors,
+// });

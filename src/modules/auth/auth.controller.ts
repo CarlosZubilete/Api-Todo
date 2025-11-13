@@ -5,31 +5,30 @@ import * as service from "./auth.service";
 import { NotFoundException } from "../../exceptions/NotFoundException";
 import { compareSync } from "bcrypt";
 import { NODE_ENV } from "../../secrets";
+import type { User } from "../../generated/client";
+import { signupSchema } from "./auth.schema";
+import { InternalException } from "../../exceptions/InternalException";
 
 export const signup = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  // validation schema:
+  signupSchema.parse(req.body);
   const { name, email, password } = req.body;
-
   // This return a user
-  const existingUser = await service.isExists({ email });
-
-  console.log("existingUser: " + existingUser); // existingUser: null
-
-  if (existingUser) {
+  const existingUser: User | null = await service.isExists({ email });
+  // console.log("existingUser: " + existingUser); // existingUser: null
+  if (existingUser)
     return next(
       new BadRequestException(
         "User already exists!",
         ErrorCode.USER_ALREADY_EXISTS
       )
     );
-  }
-
-  const user = await service.create({ name, email, password });
-
-  res.status(201).json(user);
+  const user: User = await service.create({ name, email, password });
+  res.status(201).json({ email: user.email, role: user.role });
 };
 
 export const login = async (
@@ -39,7 +38,7 @@ export const login = async (
 ) => {
   const { email, password } = req.body;
 
-  const user = await service.isExists({ email });
+  const user: User | null = await service.isExists({ email });
 
   if (!user)
     return next(
@@ -54,7 +53,7 @@ export const login = async (
       )
     );
 
-  const token = await service.createToken(user);
+  const token: string = await service.createToken(user);
 
   res.cookie("jwt", token, {
     httpOnly: true,
@@ -64,17 +63,20 @@ export const login = async (
     // path: '/', domain: 'your-dns'
   });
 
-  res.status(200).json(token);
+  res.status(200).json({ userID: user.id, message: "Login success!" });
 };
 
+// * [authMiddleware]
 export const logout = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const disableToken = await service.deleteToken(req.body.key, req.body.id);
+  // const tokenRec = (req as any).token;
+
+  const userToken = await service.deleteToken(req.token.key, req.token.id);
   // this error exception is wrong
-  if (!disableToken)
+  if (!userToken)
     return next(
       new NotFoundException("Token does not exists!", ErrorCode.USER_NOT_FOUND)
     );
@@ -85,5 +87,20 @@ export const logout = async (
     secure: NODE_ENV === "production",
   });
 
-  res.status(201).json({ message: "Logout success" });
+  res.status(201).json({ userId: userToken.userId, message: "Logout success" });
+};
+
+export const list = async (req: Request, res: Response, next: NextFunction) => {
+  const list: User[] = await service.userList();
+
+  if (!list)
+    return next(
+      new InternalException(
+        "Error when list users",
+        ErrorCode.INTERNAL_EXCEPTION,
+        500
+      )
+    );
+
+  res.status(200).json(list);
 };
