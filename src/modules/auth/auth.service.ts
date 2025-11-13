@@ -14,7 +14,6 @@ export const create = async (
       password: hashSync(user.password, parseInt(SALT_ROUND)),
     },
   });
-
   return result;
 };
 
@@ -25,7 +24,7 @@ export const isExists = async (user: Pick<User, "email">) => {
 export const createToken = async (
   user: Pick<User, "id" | "name" | "email" | "password" | "role">
 ) => {
-  // 1. generate token
+  // 1. Generate token:
   const token: string = jwt.sign(
     {
       sub: user.id,
@@ -35,7 +34,7 @@ export const createToken = async (
     JWT_SECRET,
     { expiresIn: "1h" }
   );
-  // Save token in Token Table
+  // Save token in Token Table:
   const saveToken: Token = await db.token.create({
     data: {
       key: token,
@@ -64,6 +63,6 @@ export const deleteToken = async (token: string, id: number) => {
   });
 };
 
-export const userList = async () => {
-  return await db.user.findMany();
-};
+// export const userList = async () => {
+//   return await db.user.findMany();
+// };

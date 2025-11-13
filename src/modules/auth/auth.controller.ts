@@ -7,7 +7,6 @@ import { compareSync } from "bcrypt";
 import { NODE_ENV } from "../../secrets";
 import type { User } from "../../generated/client";
 import { signupSchema } from "./auth.schema";
-import { InternalException } from "../../exceptions/InternalException";
 
 export const signup = async (
   req: Request,
@@ -72,13 +71,11 @@ export const logout = async (
   res: Response,
   next: NextFunction
 ) => {
-  // const tokenRec = (req as any).token;
-
   const userToken = await service.deleteToken(req.token.key, req.token.id);
   // this error exception is wrong
   if (!userToken)
     return next(
-      new NotFoundException("Token does not exists!", ErrorCode.USER_NOT_FOUND)
+      new NotFoundException("Token does not exists!", ErrorCode.TOKEN_NOT_FOUND)
     );
 
   res.clearCookie("jwt", {
@@ -88,19 +85,4 @@ export const logout = async (
   });
 
   res.status(201).json({ userId: userToken.userId, message: "Logout success" });
-};
-
-export const list = async (req: Request, res: Response, next: NextFunction) => {
-  const list: User[] = await service.userList();
-
-  if (!list)
-    return next(
-      new InternalException(
-        "Error when list users",
-        ErrorCode.INTERNAL_EXCEPTION,
-        500
-      )
-    );
-
-  res.status(200).json(list);
 };

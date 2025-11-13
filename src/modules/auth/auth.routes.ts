@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { list, login, logout, signup } from "./auth.controller";
+import { login, logout, signup } from "./auth.controller";
 import { errorHandler } from "../../error-handler";
 import { authMiddleware } from "../../middleware/authMiddleware";
-import { isAdminMiddleware } from "../../middleware/isAdminMiddleware";
+// import { isAdminMiddleware } from "../../middleware/isAdminMiddleware";
 
 const authRouter: Router = Router();
 
@@ -11,9 +11,11 @@ const authRouter: Router = Router();
 
 authRouter.post("/signup", errorHandler(signup));
 authRouter.post("/login", errorHandler(login));
-// MIDDLEWARE
 authRouter.post("/logout", [authMiddleware], errorHandler(logout));
+
 // MIDDLEWARE AND ADMIN
-authRouter.get("/", [authMiddleware, isAdminMiddleware], errorHandler(list));
+// authRouter.get("/", [authMiddleware, isAdminMiddleware], errorHandler(list));
+// // UpDate:
+// authRouter.put("/", [authMiddleware, isAdminMiddleware]);
 
 export default authRouter;

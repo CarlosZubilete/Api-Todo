@@ -6,6 +6,8 @@ export enum ErrorCode {
   INTERNAL_EXCEPTION = 3001,
   UNAUTHORIZED = 4001,
   VALIDATION_ERROR = 5002,
+  TOKEN_NOT_FOUND = 6001,
+  SELF_DEMOTION = 7001,
 }
 
 export class HttpException extends Error {
