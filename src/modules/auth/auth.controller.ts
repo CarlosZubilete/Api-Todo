@@ -6,7 +6,7 @@ import { NotFoundException } from "../../exceptions/NotFoundException";
 import { compareSync } from "bcrypt";
 import { NODE_ENV } from "../../secrets";
 import type { User } from "../../generated/client";
-import { signupSchema } from "./auth.schema";
+import { singUpSchema } from "./singUp.schema";
 
 export const signup = async (
   req: Request,
@@ -14,11 +14,13 @@ export const signup = async (
   next: NextFunction
 ) => {
   // validation schema:
-  signupSchema.parse(req.body);
-  const { name, email, password } = req.body;
+  let data = singUpSchema.parse(req.body);
+  // const { name, email, password } = req.body;
   // This return a user
-  const existingUser: User | null = await service.isExists({ email });
-  // console.log("existingUser: " + existingUser); // existingUser: null
+  const existingUser: User | null = await service.isExists({
+    email: data.email,
+  });
+  // if the user already existing
   if (existingUser)
     return next(
       new BadRequestException(
@@ -26,7 +28,14 @@ export const signup = async (
         ErrorCode.USER_ALREADY_EXISTS
       )
     );
-  const user: User = await service.create({ name, email, password });
+
+  const user: User = await service.create({
+    name: data.name,
+    email: data.email,
+    password: data.password,
+    role: data?.role ?? "USER",
+  });
+
   res.status(201).json({ email: user.email, role: user.role });
 };
 

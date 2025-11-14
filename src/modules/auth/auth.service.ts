@@ -5,13 +5,14 @@ import { type Token, type User } from "../../generated/client";
 import jwt from "jsonwebtoken";
 
 export const create = async (
-  user: Pick<User, "name" | "email" | "password">
+  user: Pick<User, "name" | "email" | "password" | "role">
 ) => {
   const result: User = await db.user.create({
     data: {
       name: user.name,
       email: user.email,
       password: hashSync(user.password, parseInt(SALT_ROUND)),
+      role: user.role,
     },
   });
   return result;
