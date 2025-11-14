@@ -18,15 +18,13 @@ export const authMiddleware = async (
 ) => {
   // is there a token?
   //const token: string = req.headers.authorization?.split(" ")[1]!; // "bearer <token>"
-
   const token: string | undefined = req.cookies.jwt;
-  // console.log("TOKEN: " + token);
 
   if (!token)
     return next(
       new UnauthorizedException("Unauthorized", ErrorCode.UNAUTHORIZED)
     );
-  // verify token:
+  // * verify token:
   try {
     const payload: AuthPayload = jwt.verify(token, JWT_SECRET) as AuthPayload;
 
@@ -59,22 +57,3 @@ export const authMiddleware = async (
     next(new UnauthorizedException("Unauthorized", ErrorCode.UNAUTHORIZED));
   }
 };
-
-// This is a verify when we're verifying token without cookie ...
-// const token: string = req.headers.authorization?.split(" ")[1]!; // "bearer <token>"
-
-/* 
-
-const user: User | null = await db.user.findFirst({
-  where: {
-    id: Number(payload.sub),
-  },
-});
-
-if (!user)
-  return next(
-    new UnauthorizedException("Unauthorized", ErrorCode.UNAUTHORIZED)
-  );
-
-req.user = user;
-*/

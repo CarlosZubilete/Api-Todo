@@ -14,10 +14,19 @@ export const listUser = async (
   next: NextFunction
 ) => {
   const list: User[] = await service.userList();
-
-  // todo: implement internal error...
   if (!list) return next();
+  res.status(200).json(list);
+};
 
+export const listFilerUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // console.log(req.query.deleted);
+  const deleted = req.query.deleted === "true";
+  const list: User[] = await service.userFilterList(deleted);
+  if (!list) return next();
   res.status(200).json(list);
 };
 
@@ -27,14 +36,11 @@ export const findUser = async (
   next: NextFunction
 ) => {
   const { id } = req.params;
-
   const user: User | null = await service.userByID(Number(id));
-
   if (!user)
     return next(
       new NotFoundException("User not found", ErrorCode.USER_NOT_FOUND)
     );
-
   res.status(200).json(user);
 };
 

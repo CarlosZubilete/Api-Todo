@@ -5,6 +5,14 @@ export const userList = async () => {
   return await db.user.findMany();
 };
 
+export const userFilterList = async (isDelete: boolean) => {
+  return await db.user.findMany({
+    where: {
+      delete: isDelete,
+    },
+  });
+};
+
 export const userByID = async (id: number) => {
   return await db.user.findFirst({
     where: { id },

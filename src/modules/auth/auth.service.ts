@@ -44,26 +44,15 @@ export const createToken = async (
   });
   // Validation:
   if (!saveToken) throw new Error("Can't save token into Token table");
-
   return token;
 };
 
-// TODO: if we still use sqlite change: hard delete (physical delete) for Token.
 export const deleteToken = async (token: string, id: number) => {
-  // console.log("deleteToken token" + token);
-  // console.log("deleteToken id" + id);
-  return await db.token.update({
+  return await db.token.delete({
     where: {
       id,
       key: token,
       active: true,
     },
-    data: {
-      active: false,
-    },
   });
 };
-
-// export const userList = async () => {
-//   return await db.user.findMany();
-// };

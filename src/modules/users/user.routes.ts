@@ -2,14 +2,31 @@ import { Router } from "express";
 import { authMiddleware } from "../../middleware/authMiddleware";
 import { isAdminMiddleware } from "../../middleware/isAdminMiddleware";
 import { errorHandler } from "../../error-handler";
-import { listUser, findUser, updateUser, softDelete } from "./user.controller";
+import {
+  listUser,
+  findUser,
+  updateUser,
+  softDelete,
+  listFilerUsers,
+} from "./user.controller";
 
 const userRouter: Router = Router();
 
+// TODO: implements variable parameter to get all users , also deleted.
 userRouter.get(
   "/",
   [authMiddleware, isAdminMiddleware],
   errorHandler(listUser)
+);
+
+/*
+GET /user?deleted=true
+GET /user?deleted=false
+*/
+userRouter.get(
+  "/user",
+  [authMiddleware, isAdminMiddleware],
+  errorHandler(listFilerUsers)
 );
 
 userRouter.get(
