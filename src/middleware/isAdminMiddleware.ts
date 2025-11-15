@@ -7,9 +7,6 @@ export const isAdminMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  // const user: User = req.body;
-  // console.log("isAdminMiddleware: " + user);
-
   if (req.user.role !== "ADMIN")
     return next(
       new UnauthorizedException(

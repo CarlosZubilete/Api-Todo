@@ -1,6 +1,8 @@
 import { db } from "../../config/db";
 import type { User } from "../../generated/client";
 
+// todo: create a user function.
+
 export const userList = async () => {
   return await db.user.findMany();
 };
