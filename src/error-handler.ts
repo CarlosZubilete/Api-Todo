@@ -37,16 +37,3 @@ export const errorHandler = (method: RequestHandler): RequestHandler => {
     }
   };
 };
-
-// if (!res.headersSent) {
-//   res.status(exception._statusCode).json({
-//     message: exception._message,
-//     errorCode: exception._errorCode,
-//     errors: exception._errors,
-//   });
-// }
-// res.status(exception._statusCode).json({
-//   message: exception._message,
-//   errorCode: exception._errorCode,
-//   errors: exception._errors,
-// });

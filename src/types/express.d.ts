@@ -1,11 +1,16 @@
-import { User, Token } from "@prisma/client";
 import "express-serve-static-core ";
 
 declare global {
   namespace Express {
     interface Request {
-      user: User;
-      token: Token;
+      user: {
+        id: number;
+        role: string;
+      };
+      token: {
+        id: number;
+        key: string;
+      };
     }
   }
 }

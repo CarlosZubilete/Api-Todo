@@ -1,15 +1,10 @@
 import { db } from "../../config/db";
-import type { Task } from "../../generated/client";
+import type { Task } from "@prisma/client";
 
 export const createTask = async (
   id: number,
   task: { title: string; description?: string }
 ) => {
-  // export const createTask = async (
-  //   id: number,
-  //   task: Pick<Task, "title" | "description">
-  // ) => {
-
   return await db.task.create({
     data: {
       title: task.title,
@@ -28,13 +23,33 @@ export const findTasksByUser = async (idUser: number) => {
   });
 };
 
-export const findTaskById = async (idUser: number, idTask: number) => {
+export const findTaskById = async (idUser: number, id: number) => {
   return await db.task.findFirst({
     where: {
-      id: idTask,
+      id,
       userId: idUser,
       delete: false,
     },
+  });
+};
+
+export const listTaskCompleted = async (
+  isCompleted: boolean,
+  userId: number
+) => {
+  return await db.task.findMany({
+    where: {
+      userId,
+      completed: isCompleted,
+      delete: false,
+    },
+  });
+};
+
+export const completedTask = async (userId: number, id: number) => {
+  return await db.task.updateMany({
+    where: { id, userId, delete: false },
+    data: { completed: true },
   });
 };
 
@@ -50,10 +65,10 @@ export const updateTask = async (task: Task) => {
   });
 };
 
-export const softDelete = async (idUser: number, idTask: number) => {
+export const softDelete = async (idUser: number, id: number) => {
   return await db.task.update({
     where: {
-      id: idTask,
+      id,
       userId: idUser,
     },
     data: {

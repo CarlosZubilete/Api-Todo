@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { login, logout, signup } from "./auth.controller";
+import * as ctrl from "./auth.controller";
 import { errorHandler } from "../../error-handler";
 import { authMiddleware } from "../../middleware/authMiddleware";
 
 const authRouter: Router = Router();
 
-authRouter.post("/signup", errorHandler(signup));
-authRouter.post("/login", errorHandler(login));
-authRouter.post("/logout", [authMiddleware], errorHandler(logout));
+authRouter.post("/signup", errorHandler(ctrl.signup));
+authRouter.post("/login", errorHandler(ctrl.login));
+authRouter.post("/logout", [authMiddleware], errorHandler(ctrl.logout));
 
 export default authRouter;

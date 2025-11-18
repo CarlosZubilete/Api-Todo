@@ -1,7 +1,5 @@
 import { db } from "../../config/db";
-import type { User } from "../../generated/client";
-
-// todo: create a user function.
+import type { User } from "@prisma/client";
 
 export const userList = async () => {
   return await db.user.findMany();
@@ -35,7 +33,7 @@ export const userUpdate = async (user: User) => {
   });
 };
 
-// * Soft delete ...
+// *Soft delete
 export const userSoftDelete = async (id: number) => {
   return await db.user.update({
     where: {

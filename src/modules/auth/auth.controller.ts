@@ -1,11 +1,11 @@
-import { type NextFunction, type Request, type Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { BadRequestException } from "../../exceptions/BadRequestException";
 import { ErrorCode } from "../../exceptions/HttpException";
 import * as service from "./auth.service";
 import { NotFoundException } from "../../exceptions/NotFoundException";
 import { compareSync } from "bcrypt";
 import { NODE_ENV } from "../../secrets";
-import type { User } from "../../generated/client";
+import type { User } from "@prisma/client";
 import { singUpSchema } from "./singUp.schema";
 
 export const signup = async (

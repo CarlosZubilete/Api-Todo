@@ -4,7 +4,7 @@ import { NotFoundException } from "../../exceptions/NotFoundException";
 import { ErrorCode } from "../../exceptions/HttpException";
 import { createTaskSchema, updateTaskSchema } from "./task.schema";
 import { BadRequestException } from "../../exceptions/BadRequestException";
-import type { Task } from "../../generated/client";
+import type { Task } from "@prisma/client";
 
 export const create = async (
   req: Request,
@@ -71,6 +71,19 @@ export const findOne = async (
   res.status(200).json({ success: true, data: isTaskExists });
 };
 
+export const taskFilter = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const idUser = req.user.id;
+  // console.log("taskFilter: " + idUser);
+  const completed: boolean = req.query.completed === "true";
+  const list: Task[] = await service.listTaskCompleted(completed, idUser);
+  if (!list) return next();
+  res.status(200).json({ success: true, data: list });
+};
+
 export const update = async (
   req: Request,
   res: Response,
@@ -112,6 +125,38 @@ export const update = async (
     );
 
   res.status(201).json({ success: true, data: updated });
+};
+
+export const completed = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.params;
+  const idTask = Number(id);
+  const idUser = req.user.id;
+
+  const isTaskExists: Task | null = await service.findTaskById(idUser, idTask);
+
+  if (!isTaskExists)
+    return next(
+      new NotFoundException(
+        "Task does not exists!",
+        ErrorCode.USER_TASK_NOT_FOUND
+      )
+    );
+
+  const completed = await service.completedTask(idUser, idTask);
+
+  if (completed.count === 0)
+    return next(
+      new BadRequestException(
+        "Task was not completed",
+        ErrorCode.UNPROCESSABLE_ENTITY
+      )
+    );
+
+  res.status(201).json({ success: true, message: "Task has been completed" });
 };
 
 export const deleted = async (

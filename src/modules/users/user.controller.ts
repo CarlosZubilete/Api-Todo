@@ -1,5 +1,5 @@
-import { type Request, type Response, type NextFunction } from "express";
-import type { User } from "../../generated/client";
+import type { Request, Response, NextFunction } from "express";
+import type { User } from "@prisma/client";
 import * as service from "./user.service";
 import { NotFoundException } from "../../exceptions/NotFoundException";
 import { ErrorCode } from "../../exceptions/HttpException";
@@ -8,29 +8,13 @@ import { BadRequestException } from "../../exceptions/BadRequestException";
 import { hashSync } from "bcrypt";
 import { SALT_ROUND } from "../../secrets";
 
-export const listUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const list = async (req: Request, res: Response, next: NextFunction) => {
   const list: User[] = await service.userList();
   if (!list) return next();
   res.status(200).json(list);
 };
 
-export const listFilerUsers = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  // console.log(req.query.deleted);
-  const deleted = req.query.deleted === "true";
-  const list: User[] = await service.userFilterList(deleted);
-  if (!list) return next();
-  res.status(200).json(list);
-};
-
-export const findUser = async (
+export const findOne = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -44,7 +28,19 @@ export const findUser = async (
   res.status(200).json(user);
 };
 
-export const updateUser = async (
+export const listFiler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // console.log(req.query.deleted);
+  const deleted = req.query.deleted === "true";
+  const list: User[] = await service.userFilterList(deleted);
+  if (!list) return next();
+  res.status(200).json(list);
+};
+
+export const update = async (
   req: Request,
   res: Response,
   next: NextFunction

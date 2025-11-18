@@ -1,7 +1,7 @@
 import { hashSync } from "bcrypt";
 import { db } from "../../config/db";
 import { JWT_SECRET, SALT_ROUND } from "../../secrets";
-import { type Token, type User } from "../../generated/client";
+import type { Token, User } from "@prisma/client";
 import jwt from "jsonwebtoken";
 
 export const create = async (
@@ -19,7 +19,12 @@ export const create = async (
 };
 
 export const isExists = async (user: Pick<User, "email">) => {
-  return await db.user.findFirst({ where: { email: user.email } });
+  return await db.user.findFirst({
+    where: {
+      email: user.email,
+      delete: false,
+    },
+  });
 };
 
 export const createToken = async (
