@@ -8,6 +8,9 @@
     "build": "tsc",
     "start": "node dist/app.js"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "dependencies": {
     "bcrypt": "6.0.0",
     "cookie-parser": "^1.4.7",
@@ -18,6 +21,7 @@
   },
   "devDependencies": {
     "@prisma/client": "6.19.0",
+    "@prisma/migrate": "7.0.0",
     "@types/bcrypt": "6.0.0",
     "@types/cookie-parser": "1.4.10",
     "@types/express": "5.0.5",
