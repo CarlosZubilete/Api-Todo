@@ -21,7 +21,6 @@
   },
   "devDependencies": {
     "@prisma/client": "6.19.0",
-    "@prisma/migrate": "7.0.0",
     "@types/bcrypt": "6.0.0",
     "@types/cookie-parser": "1.4.10",
     "@types/express": "5.0.5",
