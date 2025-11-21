@@ -269,14 +269,6 @@ Please follow the code style and include tests for major features.
 
 ## 📝 License
 
-This project is licensed under the **MIT License**. See `LICENSE` for details.
+This project is licensed under the **MIT License**.
 
 ---
-
-If you want, I can:
-
-- create a shortened `docker-compose.yml`
-- add a production-ready `Dockerfile` (multi-stage)
-- prepare GitHub Actions for tests + deploy
-
-Tell me which of these you'd like me to add next.
