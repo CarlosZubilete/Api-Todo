@@ -11,9 +11,14 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./:/app  # Sync your local code in /app
-      - /app/node_modules # Prevents the host's node_modules from overwriting the container
-      - prisma_data:/app/prisma # The SQLite database persists if you use it (avoid losing dev.db)
+      # Sync your local code in /app
+      - ./:/app # bind mount your project (dev)
+      # Prevents the host's node_modules from overwriting the container
+      - /app/node_modules  # keep container node_modules
+      # The SQLite database persists if you use it (avoid losing dev.db)
+      - prisma_data:/app/prisma 
+    environment:
+        - CI=true # avoid prompts of pnpm "non-TTY"
     command: >
       sh -c "
         corepack enable &&

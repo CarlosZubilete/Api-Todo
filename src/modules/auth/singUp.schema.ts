@@ -7,5 +7,5 @@ export const singUpSchema = z.object({
     .trim()
     .min(6, "Email must be at least 6 characters"),
   password: z.string().trim().min(6, "Password must be at least 6 characters"),
-  role: z.enum(["USER", "ADMIN"]).optional(),
+  // role: z.enum(["USER", "ADMIN"]).optional(), // *Removed to prevent role assignment on sign up
 });

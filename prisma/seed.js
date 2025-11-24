@@ -1,13 +1,17 @@
 // This only execute onces in production.
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
+//import { PrismaClient } from "@prisma/client";
+//import bcrypt from "bcrypt";
+
+const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcrypt");
+
 const db = new PrismaClient();
 
 async function main() {
-  const adminEmail: string = process.env.ADMIN_EMAIL!;
-  const adminPass: string = process.env.ADMIN_PASS!;
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPass = process.env.ADMIN_PASS;
 
-  const hash = await bcrypt.hash(adminPass, 10);
+  const hash = bcrypt.hashSync(adminPass, 10);
 
   await db.user.upsert({
     where: { email: adminEmail },

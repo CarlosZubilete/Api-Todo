@@ -8,17 +8,15 @@ WORKDIR /app
 # Enable pnpm
 RUN corepack enable && corepack prepare pnpm@10.20.0 --activate
 
-# Copy package files and install all dependencies (including devDependencies for build)
+# Copy package files and install all dependencies (including devDependencies)
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install
 
-# Copy Prisma schema
+# Copy prisma schema and generate client (needs dependencies)
 COPY prisma ./prisma
-
-# Generate Prisma Client (required for TypeScript compilation)
 RUN pnpm prisma generate
 
-# Copy source files and build configuration
+# Copy source files and build configuration (tsconfig needed only for build)
 COPY tsconfig.json ./
 COPY src ./src
 
@@ -32,26 +30,27 @@ FROM node:22-alpine AS runtime
 
 WORKDIR /app
 
-# Enable pnpm
+# Enable pnpm for runtime scripts if needed
 RUN corepack enable && corepack prepare pnpm@10.20.0 --activate
 
-# Copy package files and install only production dependencies
+# Copy package.json and production node_modules from builder (no install in runtime)
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --prod
-
-# Copy Prisma schema from builder
-COPY prisma ./prisma
-
-# Copy node_modules and compiled application from builder
+# Copy node_modules built in the builder to runtime (includes all deps)
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
 
-# Expose port
+# Copy compiled app, prisma schema, and seed (seed.js should be JS)
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY prisma/seed.js ./prisma/seed.js
+
+# Copy an entrypoint script (will run migrations & seed at container start)
+COPY ./docker/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 EXPOSE 3000
 
-# Health check (optional but recommended)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+  CMD node -e "require('http').get('http://localhost:3000', (r) => { if (r.statusCode !== 200) throw new Error(r.statusCode) })"
 
-# Start application with proper signal handling
+ENTRYPOINT [ "/app/entrypoint.sh" ]
 CMD ["node", "dist/app.js"]
