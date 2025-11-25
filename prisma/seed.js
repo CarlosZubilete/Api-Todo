@@ -11,6 +11,11 @@ async function main() {
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPass = process.env.ADMIN_PASS;
 
+  if (!adminEmail || !adminPass) {
+    console.log("Admin seed skipped: missing ADMIN_EMAIL or ADMIN_PASS");
+    return;
+  }
+
   const hash = bcrypt.hashSync(adminPass, 10);
 
   await db.user.upsert({

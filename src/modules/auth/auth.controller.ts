@@ -33,7 +33,8 @@ export const signup = async (
     name: data.name,
     email: data.email,
     password: data.password,
-    role: data?.role ?? "USER",
+    // role: data?.role ?? "USER",
+    role: "USER", // *ALways assign USER role on sign up
   });
 
   res.status(201).json({ email: user.email, role: user.role });
@@ -65,8 +66,8 @@ export const login = async (
 
   res.cookie("jwt", token, {
     httpOnly: true,
-    // sameSite: "strict", // o 'lax'
-    secure: NODE_ENV === "production",
+    sameSite: "lax", // allows cookie to be sent with same-site requests
+    secure: false, // set to false for HTTP development/testing, true for HTTPS production
     maxAge: 60 * 60 * 1000,
     // path: '/', domain: 'your-dns'
   });
@@ -89,7 +90,7 @@ export const logout = async (
 
   res.clearCookie("jwt", {
     httpOnly: true,
-    // sameSite: "strict", // o 'lax'
+    sameSite: "lax", // o 'strict'
     secure: NODE_ENV === "production",
   });
 

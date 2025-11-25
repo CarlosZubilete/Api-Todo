@@ -2,13 +2,13 @@ version: "3.8"
 
 services:
   app:
-    image: happykitten/api-todo:latest   # the image you will upload / download
+    image: happykitten/api-todo:1.0.2   # the image you will upload / download
     env_file:
       - .env.prod                         # here you put JWT_SECRET, ADMIN_EMAIL, ADMIN_PASS, DATABASE_URL=file:/app/prisma/dev.db
     ports:
       - "3000:3000"
-    volumes:
-      - prisma_data:/app/prisma
+    # volumes:
+      # - prisma_data:/app/prisma/dev.db 
     environment:
       - NODE_ENV=production
     restart: unless-stopped

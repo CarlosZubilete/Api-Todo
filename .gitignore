@@ -5,6 +5,7 @@ node_modules
 
 # Environment variables
 .env
+.env.prod
 .env*.local
 
 # TypeScript build outputs
